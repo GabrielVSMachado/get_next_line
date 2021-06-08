@@ -6,7 +6,7 @@
 /*   By: gvitor-s <gvitor-s@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 14:52:22 by gvitor-s          #+#    #+#             */
-/*   Updated: 2021/06/08 18:17:12 by gvitor-s         ###   ########.fr       */
+/*   Updated: 2021/06/08 19:34:30 by gvitor-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int	get_next_line(int fd, char **line)
 		i = 0;
 		while (buffer[fd][i] != '\n' && buffer[fd][i])
 			i++;
-		if (buffer[fd][i] == '\n')
+		if (buffer[fd][i] == '\n' && i != 0)
 		{
 			tmp = ft_substr(buffer[fd], 0, i - 1);
 			if (!tmp)
@@ -42,13 +42,11 @@ int	get_next_line(int fd, char **line)
 				return (free(tmp), (-1));
 			}
 			*line = ft_strjoin(*line, tmp);
-			buffer[fd] += i + 1;
-			if (!buffer[fd])
-				buffer[fd] = ft_strdup("");
 			return (free(tmp), 1);
 		}
 		else
 			*line = ft_strjoin(*line, buffer[fd]);
+		buffer[fd] += i + 1;
 	}
 }
 
