@@ -6,47 +6,54 @@
 /*   By: gvitor-s <gvitor-s@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 14:52:22 by gvitor-s          #+#    #+#             */
-/*   Updated: 2021/06/08 19:34:30 by gvitor-s         ###   ########.fr       */
+/*   Updated: 2021/06/10 22:36:43 by gvitor-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+static int	get_line(char **buffer, int fd);
+static int	check_newline(char **str);
+static char	*treat_readed_str(char **src, char **dst);
 
 int	get_next_line(int fd, char **line)
 {
-	static char		*buffer[1024];
-	char			*tmp;
-	int				i;
-	ssize_t			from_read;
+	static char	*buffer[1024];
 
-	if (buffer[fd])
-		*line = ft_strjoin(*line, buffer[fd]);
-	buffer[fd] = malloc(BUFFER_SIZE + 1);
-	while (TRUE)
-	{
-		from_read = read(fd, buffer[fd], BUFFER_SIZE);
-		if (from_read == -1)
-			return (free(buffer[fd]), (-1));
-		else if (from_read == 0)
-			return (0);
-		buffer[fd][ft_strlen(buffer[fd])] = '\0';
-		i = 0;
-		while (buffer[fd][i] != '\n' && buffer[fd][i])
-			i++;
-		if (buffer[fd][i] == '\n' && i != 0)
-		{
-			tmp = ft_substr(buffer[fd], 0, i - 1);
-			if (!tmp)
-			{
-				free(buffer[fd]);
-				return (free(tmp), (-1));
-			}
-			*line = ft_strjoin(*line, tmp);
-			return (free(tmp), 1);
-		}
-		else
-			*line = ft_strjoin(*line, buffer[fd]);
-		buffer[fd] += i + 1;
-	}
+	if (!buffer[fd])
+		buffer[fd] = ft_calloc(BUFFER_SIZE + 1, 1);
 }
 
+static int	get_line(char **buffer, int fd)
+{
+	ssize_t		from_read;
+
+	from_read = read(fd, *buffer, BUFFER_SIZE);
+	if (from_read == gnl_ERROR)
+		return (gnl_ERROR);
+	else if (from_read == gnl_EOF)
+		return (gnl_EOF);
+	else
+		return (gnl_READ);
+}
+
+static int	check_newline(char **str)
+{
+	int	i;
+
+	i = 0;
+	while (*str[i] != '\n' && *str[i] != '\0')
+		i++;
+	return (i);
+}
+
+static char	*treat_readed_str(char **src, char **dst)
+{
+	char	*tmp;
+	int		position_newline;
+
+	position_newline = check_newline(src);
+	if (position_newline > 0)
+	{
+		tmp = ft_substr(*src, 0, position_newline);
+	}
+}
