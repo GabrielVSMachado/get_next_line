@@ -60,30 +60,17 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	return (substr);
 }
 
-void	clean_buffer(char **buffer)
+void	*ft_calloc(size_t ntype, size_t size)
 {
-	int	i;
+	void	*r;
+	size_t	counter_s;
 
-	i = 0;
-	while (i <= 10)
-	{
-		if (buffer[i])
-			free(buffer[i]);
-		i++;
-	}
-}
-
-char	*ft_strdup(const char *src)
-{
-	char	*dst;
-	int		counter_src;
-
-	dst = (char *)malloc(sizeof(char) * (ft_strlen(src) + 1));
-	if (!dst)
+	r = malloc(ntype * size);
+	if (!r)
 		return (NULL);
-	counter_src = -1;
-	while (src[++counter_src])
-		dst[counter_src] = src[counter_src];
-	dst[counter_src] = '\0';
-	return (dst);
+	counter_s = 0;
+	while ((ntype * size) > counter_s)
+		((char *)r)[counter_s++] = '\0';
+	return (r);
 }
+
