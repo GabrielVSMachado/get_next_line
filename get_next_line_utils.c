@@ -73,4 +73,3 @@ void	*ft_calloc(size_t ntype, size_t size)
 		((char *)r)[counter_s++] = '\0';
 	return (r);
 }
-
