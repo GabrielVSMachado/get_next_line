@@ -6,34 +6,26 @@
 /*   By: gvitor-s <gvitor-s@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 14:52:22 by gvitor-s          #+#    #+#             */
-/*   Updated: 2021/06/10 22:36:43 by gvitor-s         ###   ########.fr       */
+/*   Updated: 2021/06/14 14:32:19 by gvitor-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-static int	get_line(char **buffer, int fd);
 static int	check_newline(char **str);
-static char	*treat_readed_str(char **src, char **dst);
+static int	treat_readed_str(char **src, char **dst, int fd);
+static int	treat_excess(char **src, char **dst, int fd);
 
 int	get_next_line(int fd, char **line)
 {
 	static char	*buffer[1024];
 
 	if (!buffer[fd])
+	{
 		buffer[fd] = ft_calloc(BUFFER_SIZE + 1, 1);
-}
-
-static int	get_line(char **buffer, int fd)
-{
-	ssize_t		from_read;
-
-	from_read = read(fd, *buffer, BUFFER_SIZE);
-	if (from_read == gnl_ERROR)
-		return (gnl_ERROR);
-	else if (from_read == gnl_EOF)
-		return (gnl_EOF);
+		return (treat_readed_str(&buffer[fd], line, fd));
+	}
 	else
-		return (gnl_READ);
+		return (treat_excess(&buffer[fd], line, fd));
 }
 
 static int	check_newline(char **str)
@@ -46,14 +38,48 @@ static int	check_newline(char **str)
 	return (i);
 }
 
-static char	*treat_readed_str(char **src, char **dst)
+static int	treat_readed_str(char **src, char **dst, int fd)
 {
 	char	*tmp;
-	int		position_newline;
+	char	*new_line;
 
-	position_newline = check_newline(src);
-	if (position_newline > 0)
+	while (read(fd, *src, BUFFER_SIZE) > 0)
 	{
-		tmp = ft_substr(*src, 0, position_newline);
+		if (*src[check_newline(src)] == '\n')
+			return (treat_excess(src, dst, fd));
+		tmp = ft_strdup(*src);
+		if (!tmp)
+			return (free(tmp), gnl_ERROR);
+		new_line = ft_strjoin(*dst, tmp);
+		free(*dst);
+		*dst = new_line;
 	}
+	return (free(tmp), gnl_READ);
+}
+
+static int	treat_excess(char **src, char **dst, int fd)
+{
+	int		where_n_line;
+	char	*tmp;
+	char	*new_line;
+
+	where_n_line = check_newline(src);
+	if (*src[where_n_line] == '\n')
+	{
+		tmp = ft_substr(*src, 0, where_n_line);
+		if (!tmp)
+			return (free(*src), gnl_ERROR);
+		new_line = ft_strjoin(*dst, tmp);
+		free(tmp);
+		free(*dst);
+		*dst = new_line;
+		tmp = ft_substr(*src, where_n_line + 1, ft_strlen(*src) - where_n_line);
+		free(*src);
+		if (ft_strlen(tmp) == 0)
+			*src = NULL;
+		else
+			*src = tmp;
+		return (gnl_READ);
+	}
+	return (treat_readed_str(src, dst, fd));
 }
