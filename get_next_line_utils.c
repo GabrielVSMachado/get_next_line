@@ -24,9 +24,9 @@ char	*ft_strjoin(const char *s1, const char *s2)
 		return (NULL);
 	counter = 0;
 	while (*s1)
-		final_str[counter++] = *(s1++);
+		final_str[counter++] = *s1++;
 	while (*s2)
-		final_str[counter++] = *(s2++);
+		final_str[counter++] = *s2++;
 	final_str[counter] = '\0';
 	return (final_str);
 }
@@ -72,4 +72,36 @@ void	*ft_calloc(size_t ntype, size_t size)
 	while ((ntype * size) > counter_s)
 		((char *)r)[counter_s++] = '\0';
 	return (r);
+}
+
+char	*ft_strchr(const char *str, int c)
+{
+	size_t	counter;
+
+	counter = 0;
+	if (c == '\0')
+		return ((char *)(str + ft_strlen(str)));
+	while (str[counter])
+	{
+		if (str[counter] == (unsigned char) c)
+			return ((char *)&str[counter]);
+		counter++;
+	}
+	return (NULL);
+}
+
+
+char	*ft_strdup(const char *src)
+{
+	char	*dst;
+	int		counter_src;
+
+	dst = (char *)malloc(sizeof(char) * (ft_strlen(src) + 1));
+	if (!dst)
+		return (NULL);
+	counter_src = -1;
+	while (src[++counter_src])
+		dst[counter_src] = src[counter_src];
+	dst[counter_src] = '\0';
+	return (dst);
 }
