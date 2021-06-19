@@ -6,7 +6,7 @@
 /*   By: gvitor-s <gvitor-s@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/14 20:38:18 by gvitor-s          #+#    #+#             */
-/*   Updated: 2021/06/19 16:46:05 by gvitor-s         ###   ########.fr       */
+/*   Updated: 2021/06/19 19:34:11 by gvitor-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int	get_next_line(int fd, char **line)
 		if (from_read < 0)
 			return (gnl_ERROR);
 		str_read[from_read] = '\0';
-		if (!treat_str_read(str_read, &buffer))
+		if (!treat_str_read(str_read, &buffer) && from_read != 0)
 			return (gnl_ERROR);
 		p_to_newline = ft_strchr(buffer, '\n');
 		if (p_to_newline != NULL)
@@ -39,6 +39,7 @@ int	get_next_line(int fd, char **line)
 	}
 	*line = ft_strdup(buffer);
 	free(buffer);
+	buffer = NULL;
 	return (gnl_EOF);
 }
 
