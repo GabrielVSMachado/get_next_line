@@ -5,81 +5,105 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: gvitor-s <gvitor-s@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/06/02 14:52:22 by gvitor-s          #+#    #+#             */
-/*   Updated: 2021/06/14 14:32:19 by gvitor-s         ###   ########.fr       */
+/*   Created: 2021/06/14 20:38:18 by gvitor-s          #+#    #+#             */
+/*   Updated: 2021/06/19 12:46:46 by gvitor-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-static int	check_newline(char **str);
-static int	treat_readed_str(char **src, char **dst, int fd);
-static int	treat_excess(char **src, char **dst, int fd);
+static int	treat_newline(char **src, char *p, char **line);
+static int	treat_read_str(char **src, char **dst, int *from_read);
+static int	check_error(int *fd, char **result, char **line);
 
 int	get_next_line(int fd, char **line)
 {
-	static char	*buffer[1024];
+	char		*result;
+	static char	*buffer;
+	int			from_read;
 
-	if (!buffer[fd])
+	if (check_error(&fd, &result, line) == gnl_ERROR)
+		return (gnl_ERROR);
+	from_read = 1;
+	while (from_read > 0)
 	{
-		buffer[fd] = ft_calloc(BUFFER_SIZE + 1, 1);
-		return (treat_readed_str(&buffer[fd], line, fd));
+		from_read = read(fd, result, BUFFER_SIZE);
+		if (buffer != NULL && ft_strchr(buffer, '\n') != NULL)
+			return (treat_newline(&buffer, ft_strchr(buffer, '\n'), line));
+		from_read = treat_read_str(&result, &buffer, &from_read);
 	}
+	if (from_read == -1)
+	{
+		free(result);
+		free(buffer);
+		return (gnl_ERROR);
+	}
+	treat_read_str(&buffer, line, &from_read);
+	free(buffer);
+	free(result);
+	return (gnl_EOF);
+}
+
+static int	treat_read_str(char **src, char **dst, int *from_read)
+{
+	char	*tmp;
+
+	if (!*dst)
+	{
+		*dst = ft_substr("", 0, 0);
+		if (!*dst)
+			return (gnl_ERROR);
+	}
+	if (*from_read >= 0)
+	{
+		tmp = ft_strjoin(*dst, *src);
+		if (!tmp)
+			return (gnl_ERROR);
+		free(*dst);
+		*dst = tmp;
+		if (*from_read == 0)
+			free(tmp);
+	}
+	return (*from_read);
+}
+
+static int	treat_newline(char **src, char *p, char **line)
+{
+	char	*tmp;
+	int		len;
+	char	*new_line;
+
+	len = p - *src;
+	tmp = ft_substr(*src, 0, len);
+	if (!tmp)
+		return (gnl_ERROR);
+	if (*line)
+		new_line = ft_strjoin("", tmp);
 	else
-		return (treat_excess(&buffer[fd], line, fd));
-}
-
-static int	check_newline(char **str)
-{
-	int	i;
-
-	i = 0;
-	while (*str[i] != '\n' && *str[i] != '\0')
-		i++;
-	return (i);
-}
-
-static int	treat_readed_str(char **src, char **dst, int fd)
-{
-	char	*tmp;
-	char	*new_line;
-
-	while (read(fd, *src, BUFFER_SIZE) > 0)
 	{
-		if (*src[check_newline(src)] == '\n')
-			return (treat_excess(src, dst, fd));
-		tmp = ft_strdup(*src);
-		if (!tmp)
-			return (free(tmp), gnl_ERROR);
-		new_line = ft_strjoin(*dst, tmp);
-		free(*dst);
-		*dst = new_line;
-	}
-	return (free(tmp), gnl_READ);
-}
-
-static int	treat_excess(char **src, char **dst, int fd)
-{
-	int		where_n_line;
-	char	*tmp;
-	char	*new_line;
-
-	where_n_line = check_newline(src);
-	if (*src[where_n_line] == '\n')
-	{
-		tmp = ft_substr(*src, 0, where_n_line);
-		if (!tmp)
-			return (free(*src), gnl_ERROR);
-		new_line = ft_strjoin(*dst, tmp);
+		new_line = ft_strjoin(*line, tmp);
 		free(tmp);
-		free(*dst);
-		*dst = new_line;
-		tmp = ft_substr(*src, where_n_line + 1, ft_strlen(*src) - where_n_line);
-		free(*src);
-		if (ft_strlen(tmp) == 0)
-			*src = NULL;
-		else
-			*src = tmp;
-		return (gnl_READ);
 	}
-	return (treat_readed_str(src, dst, fd));
+	if (!new_line)
+		return (gnl_ERROR);
+	*line = new_line;
+	free(tmp);
+	tmp = ft_substr(*src, len + 1, ft_strlen(*src));
+	if (!tmp)
+		return (gnl_ERROR);
+	free(*src);
+	*src = tmp;
+	return (gnl_READ);
+}
+
+static int	check_error(int *fd, char **result, char **line)
+{
+	if (*fd < 0 || BUFFER_SIZE <= 0 || !line)
+		return (gnl_ERROR);
+	*result = ft_calloc(BUFFER_SIZE + 1, 1);
+	if (!*result)
+	{
+		*result = NULL;
+		return (gnl_ERROR);
+	}
+	return (0);
 }
