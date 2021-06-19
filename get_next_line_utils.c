@@ -51,27 +51,13 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	if (substr == NULL)
 		return (NULL);
 	counter = 0;
-	while (counter < len && (len_s > (size_t)start))
+	while (counter < len && (len_s > (size_t)(start + counter)))
 	{
 		substr[counter] = s[start + counter];
 		counter++;
 	}
 	substr[counter] = '\0';
 	return (substr);
-}
-
-void	*ft_calloc(size_t ntype, size_t size)
-{
-	void	*r;
-	size_t	counter_s;
-
-	r = malloc(ntype * size);
-	if (!r)
-		return (NULL);
-	counter_s = 0;
-	while ((ntype * size) > counter_s)
-		((char *)r)[counter_s++] = '\0';
-	return (r);
 }
 
 char	*ft_strchr(const char *str, int c)
@@ -89,7 +75,6 @@ char	*ft_strchr(const char *str, int c)
 	}
 	return (NULL);
 }
-
 
 char	*ft_strdup(const char *src)
 {
