@@ -6,11 +6,11 @@
 /*   By: gvitor-s <gvitor-s@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/14 20:38:18 by gvitor-s          #+#    #+#             */
-/*   Updated: 2021/06/19 19:56:27 by gvitor-s         ###   ########.fr       */
+/*   Updated: 2021/06/19 20:48:43 by gvitor-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 static int	newline_read(char **buffer, char **line, char *p_to_newline);
 static int	treat_error(int *fd, char **line);
 static int	treat_str_read(char *src, char **dst);
